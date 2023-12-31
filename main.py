@@ -1,4 +1,5 @@
 import os
+import uvicorn
 import tempfile
 from zipfile import ZipFile
 import shutil
@@ -79,3 +80,7 @@ async def download_playlist(data: PlaylistData ):
 
     except Exception as e:
         raise HTTPException(status_code=493, detail=str(e))
+
+if __name__ == '__main__':
+    uvicorn.run(app, port=8080, host='0.0.0.0')
+
