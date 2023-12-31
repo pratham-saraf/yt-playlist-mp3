@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <title>Playlist Downloader</title>
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+ <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap">
+ <style>
+   body {
+     font-family: 'Roboto', sans-serif;
+     background-color: #f4f4f4;
+     margin: 0;
+     padding: 0;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     height: 100vh;
+   }
+
+   .container {
+     background-color: #fff;
+     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+     padding: 2em;
+     border-radius: 5px;
+   }
+
+   h1 {
+     color: #333;
+     text-align: center;
+     margin-bottom: 1em;
+   }
+
+   form {
+     display: grid;
+     gap: 1em;
+   }
+
+   label {
+     font-weight: bold;
+   }
+
+   input[type="text"] {
+     padding: 1em;
+     padding-right: 0.5px;
+     width: 100%;
+     border-radius: 5px;
+     border: 1px solid #ccc;
+   }
+
+   button {
+     padding: 1em 2em;
+     background: #4CAF50;
+     color: white;
+     border: none;
+     border-radius: 5px;
+     cursor: pointer;
+     transition: background 0.3s ease;
+   }
+
+   button:hover {
+     background: #45a049;
+   }
+
+   #message {
+     margin-top: 1em;
+     font-size: 1.2em;
+     color: #333;
+   }
+
+   #progress {
+     width: 100%;
+   }
+ </style>
+</head>
+
+<body>
+ <div class="container">
+   <h1>Playlist Downloader</h1>
+   <form id="form">
+     <label for="playlistUrl">Enter playlist URL:</label>
+     <input type="text" id="playlistUrl" name="playlistUrl">
+     <button type="submit">Download</button>
+   </form>
+   <p id="message"></p>
+ </div>
+
+  
+  <script>
+    
+    const form = document.getElementById('form');
+    const messageEl = document.getElementById('message');
+    
+    form.addEventListener('submit', async (e) => {
+
+      e.preventDefault();
+
+      messageEl.innerText = 'Downloading playlist...';
+
+      const playlistUrl = form.elements['playlistUrl'].value;
+
+      const response = await fetch('http://localhost:8000/download_playlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({url: playlistUrl})  
+      });
+      
+if (response.ok) {
+
+  const blob = await response.blob(); 
+
+  const downloadUrl = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = downloadUrl;
+  a.download = 'playlist.zip';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  messageEl.innerText = 'Download started!';
+
+
+      } else {
+        messageEl.innerText = 'Error downloading playlist: ' + await response.text();
+      }
+
+    });
+
+  </script>
+
+</body>
+</html>
