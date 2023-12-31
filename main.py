@@ -1,8 +1,9 @@
 import os
 import tempfile
 from zipfile import ZipFile
+import shutil
 from fastapi import  FastAPI, HTTPException 
-from fastapi.responses import Response
+from fastapi.responses import Response , FileResponse
 from pytube import Playlist, YouTube
 from moviepy.editor import AudioFileClip
 from pydantic import BaseModel
@@ -30,6 +31,9 @@ app.add_middleware(
 class PlaylistData(BaseModel):
    url: str
 
+@app.get("/", response_class=FileResponse)
+def read_root():
+   return FileResponse("index.html")
 
 @app.post("/download_playlist")
 async def download_playlist(data: PlaylistData ):
@@ -67,6 +71,9 @@ async def download_playlist(data: PlaylistData ):
 
         with open(zip_path, "rb") as f:
             zip_bytes = f.read()
+
+        # remove the temp directory
+        shutil.rmtree(temp_dir)
 
         return Response(content=zip_bytes, media_type="application/zip")
 
