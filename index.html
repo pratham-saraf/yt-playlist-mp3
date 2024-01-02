@@ -1,134 +1,127 @@
 <!doctype html>
 <html>
-  <head>
-    <title>Playlist Downloader</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap"
-    />
-    <style>
-      body {
-        font-family: "Roboto", sans-serif;
-        background-color: #f4f4f4;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-      }
 
-      .container {
-        background-color: #fff;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        padding: 2em;
-        border-radius: 5px;
-      }
+<head>
+  <title>Playlist Downloader</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" />
+  <style>
+    body {
+      font-family: "Roboto", sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
 
-      h1 {
-        color: #333;
-        text-align: center;
-        margin-bottom: 1em;
-      }
+    .container {
+      background-color: #fff;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      padding: 2em;
+      border-radius: 5px;
+    }
 
-      form {
-        display: grid;
-        gap: 1em;
-      }
+    h1 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 1em;
+    }
 
-      label {
-        font-weight: bold;
-      }
+    form {
+      display: grid;
+      gap: 1em;
+    }
 
-      input[type="text"] {
-        padding: 1em;
-        padding-right: 0.5px;
-        width: 100%;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-      }
+    label {
+      font-weight: bold;
+    }
 
-      button {
-        padding: 1em 2em;
-        background: #4caf50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background 0.3s ease;
-      }
+    input[type="text"] {
+      padding: 1em;
+      padding-right: 0.5px;
+      width: 100%;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
 
-      button:hover {
-        background: #45a049;
-      }
+    button {
+      padding: 1em 2em;
+      background: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
 
-      #message {
-        margin-top: 1em;
-        font-size: 1.2em;
-        color: #333;
-      }
+    button:hover {
+      background: #45a049;
+    }
 
-      #progress {
-        width: 100%;
-      }
-    </style>
-  </head>
+    #message {
+      margin-top: 1em;
+      font-size: 1.2em;
+      color: #333;
+    }
 
-  <body>
-    <div class="container">
-      <h1>Playlist Downloader</h1>
-      <form id="form" autocomplete="off">
-        <label for="playlistUrl">Enter playlist URL:</label>
-        <input type="text" id="playlistUrl" name="playlistUrl" />
-        <button type="submit">Download</button>
-      </form>
-      <p id="message"></p>
-    </div>
+    #progress {
+      width: 100%;
+    }
+  </style>
+</head>
 
-    <script>
-      const form = document.getElementById("form");
-      const messageEl = document.getElementById("message");
+<body>
+  <div class="container">
+    <h1>Playlist Downloader</h1>
+    <form id="form" autocomplete="off">
+      <label for="playlistUrl">Enter playlist URL:</label>
+      <input type="text" id="playlistUrl" name="playlistUrl" />
+      <button type="submit">Download</button>
+    </form>
+    <p id="message"></p>
+  </div>
 
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
+  <script>
+    const form = document.getElementById("form");
+    const messageEl = document.getElementById("message");
 
-        messageEl.innerText = "Downloading playlist...";
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-        const playlistUrl = form.elements["playlistUrl"].value;
+      messageEl.innerText = "Downloading playlist...";
 
-        const response = await fetch(
-          "http://localhost:8080/download_playlist",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ url: playlistUrl }),
-          },
-        );
+      const playlistUrl = form.elements["playlistUrl"].value;
 
-        if (response.ok) {
-          const blob = await response.blob();
-
-          const downloadUrl = URL.createObjectURL(blob);
-
-          const a = document.createElement("a");
-          a.href = downloadUrl;
-          a.download = "playlist.zip";
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-
-          messageEl.innerText = "Download started!";
-        } else {
-          messageEl.innerText =
-            "Error downloading playlist: " + (await response.text());
-        }
+      const response = await fetch("/download_playlist", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({url: playlistUrl}),
       });
-    </script>
-  </body>
+
+      if (response.ok) {
+        const blob = await response.blob();
+
+        const downloadUrl = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = downloadUrl;
+        a.download = "playlist.zip";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        messageEl.innerText = "Download started!";
+      } else {
+        messageEl.innerText =
+          "Error downloading playlist: " + (await response.text());
+      }
+    });
+  </script>
+</body>
+
 </html>
