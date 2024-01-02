@@ -86,5 +86,5 @@ def health_check():
     return True
 
 if __name__ == '__main__':
-    uvicorn.run(app, port=8080, host='0.0.0.0')
+    uvicorn.run(app,  host='0.0.0.0')
 
