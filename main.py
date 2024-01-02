@@ -81,6 +81,10 @@ async def download_playlist(data: PlaylistData ):
     except Exception as e:
         raise HTTPException(status_code=493, detail=str(e))
 
+@app.get("/health" , status_code=200)
+def health_check():
+    return True
+
 if __name__ == '__main__':
     uvicorn.run(app, port=8080, host='0.0.0.0')
 
