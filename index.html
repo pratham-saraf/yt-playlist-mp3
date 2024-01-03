@@ -91,7 +91,7 @@
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      messageEl.innerText = "Downloading playlist...";
+      messageEl.innerText = "Starting download...";
 
       const playlistUrl = form.elements["playlistUrl"].value;
 
@@ -104,6 +104,28 @@
       });
 
       if (response.ok) {
+        console.log("will start in 300 sec")
+        messageEl.innerText = "Download started!";
+
+        // Start trying to download the file after 25 seconds
+        setTimeout(downloadFile, 300000, playlistUrl);
+      } else {
+        messageEl.innerText =
+          "Error starting download: " + (await response.text());
+      }
+    });
+
+    let count = 0;
+
+    async function downloadFile(url) {
+      const response = await fetch(`/download_file/${encodeURIComponent(url)}`);
+
+      if (count == 30)  {
+        console.log("something broke count is 30 exiting")
+        messageEl.innerText = `Failed to get any video files from ${url}`;
+        return;
+      } else if (response.ok) {
+        
         const blob = await response.blob();
 
         const downloadUrl = URL.createObjectURL(blob);
@@ -115,12 +137,15 @@
         a.click();
         a.remove();
 
-        messageEl.innerText = "Download started!";
+        messageEl.innerText = "Download complete!";
       } else {
-        messageEl.innerText =
-          "Error downloading playlist: " + (await response.text());
+        console.log("will try again in 20 sec -  download file")
+        // If the file is not ready yet, try again in 5 seconds
+        setTimeout(downloadFile, 20000, url);
+        count ++;
+        console.log("count is",count)
       }
-    });
+    }
   </script>
 </body>
 
